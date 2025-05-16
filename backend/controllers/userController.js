@@ -94,3 +94,17 @@ exports.deleteMe = async (req, res, next) => {
     next(err);
   }
 };
+
+exports.destroy = async (req, res, next) => {
+  try {
+    const id = req.params.id; // Assuming you're passing the user ID in the URL
+    const user = await User.findByPk(id);
+    if (!user) return next(appError("User not found", 404));
+
+    await user.destroy(); // or set active = false if using soft delete
+
+    res.status(204).json({ status: "success", data: null });
+  } catch (err) {
+    next(err);
+  }
+};

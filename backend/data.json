@@ -1,0 +1,54 @@
+[
+  {
+    "title": "Adventure in the Alps",
+    "slug": "adventure-in-the-alps",
+    "description": "An exciting 7-day trek through the stunning Swiss Alps, featuring breathtaking views and challenging trails.",
+    "summary": "Experience the beauty of the Swiss Alps on this guided trekking tour suitable for intermediate hikers.",
+    "duration": 7,
+    "maxGroupSize": 15,
+    "difficulty": "medium",
+    "price": 1200,
+    "priceDiscount": 1100,
+    "startDates": ["2023-06-15", "2023-07-20", "2023-08-10"],
+    "startLocation": "Interlaken, Switzerland",
+    "locations": [
+      {
+        "description": "Jungfraujoch",
+        "coordinates": [46.5366, 7.9626]
+      },
+      {
+        "description": "Eiger Trail",
+        "coordinates": [46.5774, 7.9664]
+      }
+    ],
+    "coverImage": "alps-cover.jpg",
+    "images": ["alps-1.jpg", "alps-2.jpg", "alps-3.jpg"],
+    "isActive": true
+  },
+  {
+    "title": "Safari in Serengeti",
+    "slug": "safari-in-serengeti",
+    "description": "A 5-day wildlife safari adventure in Tanzania's famous Serengeti National Park, with chances to see the Big Five.",
+    "summary": "Witness incredible wildlife in their natural habitat during this unforgettable safari experience.",
+    "duration": 5,
+    "maxGroupSize": 12,
+    "difficulty": "easy",
+    "price": 1800,
+    "priceDiscount": 1650,
+    "startDates": ["2023-09-05", "2023-10-15", "2023-11-20"],
+    "startLocation": "Arusha, Tanzania",
+    "locations": [
+      {
+        "description": "Serengeti National Park",
+        "coordinates": [-2.3333, 34.8333]
+      },
+      {
+        "description": "Ngorongoro Crater",
+        "coordinates": [-3.1667, 35.5833]
+      }
+    ],
+    "coverImage": "serengeti-cover.jpg",
+    "images": ["serengeti-1.jpg", "serengeti-2.jpg", "serengeti-3.jpg"],
+    "isActive": true
+  }
+]
