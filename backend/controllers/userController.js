@@ -1,4 +1,5 @@
 const User = require("../models/userModel");
+const Review = require("../models/reviewModel");
 const appError = require("../utils/appError");
 
 // Upload avatar
@@ -104,6 +105,28 @@ exports.destroy = async (req, res, next) => {
     await user.destroy(); // or set active = false if using soft delete
 
     res.status(204).json({ status: "success", data: null });
+  } catch (err) {
+    next(err);
+  }
+};
+
+// Get user's reviews
+exports.getReviews = async (req, res, next) => {
+  try {
+    const user = await User.findByPk(req.user.id, {
+      attributes: ["id", "name", "email", "role", "avatar"],
+      include: [
+        {
+          model: Review,
+          attributes: ["id", "review", "rating"],
+        },
+      ],
+    });
+
+    res.status(200).json({
+      status: "success",
+      user,
+    });
   } catch (err) {
     next(err);
   }

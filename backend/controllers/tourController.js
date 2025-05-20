@@ -1,5 +1,6 @@
 const User = require("../models/userModel");
 const Tour = require("../models/tourModel");
+const Review = require("../models/reviewModel");
 const appError = require("../utils/appError");
 
 // Upload avatar
@@ -123,32 +124,6 @@ exports.saveTour = async (req, res, next) => {
   }
 };
 
-// Update current user's name or email
-exports.updateMe = async (req, res, next) => {
-  const { name, email } = req.body;
-
-  try {
-    const user = await User.findByPk(req.user.id);
-    if (!user) return next(appError("User not found", 404));
-
-    user.name = name || user.name;
-    user.email = email || user.email;
-
-    await user.save();
-
-    res.status(200).json({
-      status: "success",
-      user: {
-        id: user.id,
-        name: user.name,
-        email: user.email,
-      },
-    });
-  } catch (err) {
-    next(err);
-  }
-};
-
 // Delete a tour (deactivate or delete)
 exports.deleteTour = async (req, res, next) => {
   try {
@@ -172,6 +147,29 @@ exports.destroy = async (req, res, next) => {
     await user.destroy(); // or set active = false if using soft delete
 
     res.status(204).json({ status: "success", data: null });
+  } catch (err) {
+    next(err);
+  }
+};
+
+// Get tour's reviews
+exports.getTourReviews = async (req, res, next) => {
+  try {
+    console.log("req.tour.id", req.params.id);
+    const tour = await Tour.findByPk(req.params.id, {
+      attributes: ["id", "title"],
+      include: [
+        {
+          model: Review,
+          attributes: ["id", "review", "rating"],
+        },
+      ],
+    });
+
+    res.status(200).json({
+      status: "success",
+      tour,
+    });
   } catch (err) {
     next(err);
   }

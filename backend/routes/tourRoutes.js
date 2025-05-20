@@ -7,12 +7,14 @@ const {
   getAllTours,
   getTour,
   deleteTour,
+  getTourReviews,
 } = require("../controllers/tourController");
 
 /* public routes */
-router.get("/", getAllTours);
-router.get("/:id", getTour);
 
+router.get("/reviews", getTourReviews);
+router.get("/:id", getTour);
+router.get("/", getAllTours);
 /* admin routes */
 router.post(
   "/",
