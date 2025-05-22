@@ -9,10 +9,10 @@ import Hook from "../pages/Hook";
 import Todo from "../pages/Todo";
 import UploadForm from "../pages/UploadForm";
 import Media from "../pages/Media";
-import Register from "../pages/users/Register";
 import Users from "../pages/users/Users";
 import Login from "../pages/users/Login";
 import ProtectedRoute from "../components/auth/ProtectedRoute";
+import SignUp from "../pages/auth/SignUp";
 
 const Routers = () => {
   return (
@@ -25,7 +25,7 @@ const Routers = () => {
         <Route path="/todo" element={<Todo />} />
         <Route path="/media" element={<Media />} />
         <Route path="/upload-form" element={<UploadForm />} />
-        <Route path="/register" element={<Register />} />
+        <Route path="/signup" element={<SignUp />} />
         <Route
           path="/users"
           element={
