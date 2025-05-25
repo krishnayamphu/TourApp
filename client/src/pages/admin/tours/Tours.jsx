@@ -1,12 +1,27 @@
 import axios from "axios";
-import { useContext, useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
-import { AuthContext } from "../../../context/AuthContext";
-
+import { useEffect, useState } from "react";
 export default function Tours() {
+  const [tours, setTours] = useState([]);
+  const fetchTours = async () => {
+    const url = "http://localhost:3000/api/tours";
+    const res = await axios.get(url);
+    setTours(res.data.tours);
+  };
+
+  useEffect(() => {
+    fetchTours();
+  }, []);
+
   return (
-    <div className="w-2/3 mx-auto shadow-lg p-4 mt-10 bg-white rounded-lg">
+    <div className="p-4">
       <h1>All Tours</h1>
+      <ul>
+        {tours.map((tour, index) => (
+          <li key={index} className="flex items-center mb-2">
+            {tour.title}
+          </li>
+        ))}
+      </ul>
     </div>
   );
 }

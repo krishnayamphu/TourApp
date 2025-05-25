@@ -27,17 +27,22 @@ export default function AdminLayout() {
     {
       label: "Dashboard",
       icon: "pi pi-chart-bar",
-      routerLink: "/admin",
+      command: () => navigate("/admin"),
+    },
+    {
+      label: "Bookings",
+      icon: "pi pi-shopping-bag",
+      command: () => navigate("/admin/bookings"),
     },
     {
       label: "Tours",
-      icon: "pi pi-map-marker",
-      routerLink: "/admin/tours",
+      icon: "pi pi-copy",
+      command: () => navigate("/admin/tours"),
     },
     {
       label: "Users",
       icon: "pi pi-users",
-      routerLink: "/admin/users",
+      command: () => navigate("/admin/users"),
     },
   ];
 
@@ -49,8 +54,8 @@ export default function AdminLayout() {
         </div>
       </header>
 
-      <main className="flex p-4 gap-4">
-        <div className="w-64">
+      <main className="flex gap-4">
+        <div className="w-64 p-2 bg-gray-100 min-h-screen">
           <PanelMenu model={sideNavItems} className="w-full" />
         </div>
         <div className="flex-1">

@@ -8,6 +8,8 @@ import Signin from "../pages/auth/Signin";
 import AdminDashboard from "../pages/admin/AdminDashboard";
 import Tours from "../pages/admin/tours/Tours";
 import RoleProtectedRoute from "../components/auth/RoleProtectedRoute";
+import Users from "../pages/admin/users/Users";
+import Bookings from "../pages/admin/bookings/Bookings";
 
 const Routers = () => {
   return (
@@ -26,7 +28,9 @@ const Routers = () => {
       <Route element={<RoleProtectedRoute allowedRoles={["admin"]} />}>
         <Route path="/admin" element={<AdminLayout />}>
           <Route index element={<AdminDashboard />} />
+          <Route path="bookings" element={<Bookings />} />
           <Route path="tours" element={<Tours />} />
+          <Route path="users" element={<Users />} />
         </Route>
       </Route>
     </Routes>
