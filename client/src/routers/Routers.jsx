@@ -1,40 +1,41 @@
-import React from "react";
 import { Route, Routes } from "react-router-dom";
 
 import AppLayout from "../layouts/AppLayout";
+import AdminLayout from "../layouts/AdminLayout";
 import Home from "../pages/Home";
-import About from "../pages/About";
-import Form from "../pages/Form";
-import Hook from "../pages/Hook";
-import Todo from "../pages/Todo";
-import UploadForm from "../pages/UploadForm";
-import Media from "../pages/Media";
-import Users from "../pages/users/Users";
-import Login from "../pages/users/Login";
-import ProtectedRoute from "../components/auth/ProtectedRoute";
 import SignUp from "../pages/auth/SignUp";
+import Signin from "../pages/auth/Signin";
+import AdminDashboard from "../pages/admin/AdminDashboard";
+import Tours from "../pages/admin/tours/Tours";
+import RoleProtectedRoute from "../components/auth/RoleProtectedRoute";
 
 const Routers = () => {
   return (
     <Routes>
       <Route path="/" element={<AppLayout />}>
         <Route index element={<Home />} />
-        <Route path="/about" element={<About />} />
-        <Route path="/forms" element={<Form />} />
-        <Route path="/hooks" element={<Hook />} />
-        <Route path="/todo" element={<Todo />} />
-        <Route path="/media" element={<Media />} />
-        <Route path="/upload-form" element={<UploadForm />} />
         <Route path="/signup" element={<SignUp />} />
-        <Route
-          path="/users"
-          element={
-            <ProtectedRoute>
-              <Users />
-            </ProtectedRoute>
-          }
-        />
-        <Route path="/login" element={<Login />} />
+        <Route path="/signin" element={<Signin />} />
+      </Route>
+
+      {/* <Route path="/unauthorized" element={<Unauthorized />} /> */}
+
+      {/* <Route element={<RoleProtectedRoute allowedRoles={["user"]} />}>
+        <Route path="/dashboard" element={<UserDashboard />} />
+      </Route> */}
+
+      {/* Admin routes - all protected */}
+      <Route
+        path="/admin"
+        element={
+          <RoleProtectedRoute allowedRoles={["admin"]}>
+            <AdminLayout />
+          </RoleProtectedRoute>
+        }
+      >
+        <Route index element={<AdminDashboard />} />
+        <Route path="tours" element={<Tours />} />
+        {/* <Route path="users" element={<Users />} /> */}
       </Route>
     </Routes>
   );

@@ -34,7 +34,7 @@ export default function AppLayout() {
       <header className="bg-sky-500">
         <div className="container mx-auto">
           <Menubar model={items} />
-          <nav>
+          {/* <nav>
             <ul className="flex gap-4">
               <li>
                 <Link
@@ -117,7 +117,7 @@ export default function AppLayout() {
                 </Link>
               </li>
             </ul>
-          </nav>
+          </nav> */}
         </div>
       </header>
       <main>

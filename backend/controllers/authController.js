@@ -13,11 +13,12 @@ const signToken = (userId) => {
 // Login a user
 exports.login = async (req, res, next) => {
   const { email, password } = req.body;
+  console.log("Login request body:", req.body);
   try {
     const user = await User.findOne({ where: { email } });
-    if (!user) return next(appError("Invalid email or password", 401));
+    if (!user) return next(appError("Invalid email", 401));
     const isMatch = await bcrypt.compare(password, user.password);
-    if (!isMatch) return next(appError("Invalid email or password", 401));
+    if (!isMatch) return next(appError("Invalid password", 401));
     const token = signToken(user.id);
 
     res.status(200).json({

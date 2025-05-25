@@ -7,40 +7,41 @@ import { Password } from "primereact/password";
 import { Message } from "primereact/message";
 import { Button } from "primereact/button";
 import { classNames } from "primereact/utils";
-import { registerUser } from "../../services/authService";
+import { getProfile, loginUser } from "../../services/authService";
+import { useNavigate } from "react-router-dom";
 
-export default function SignUp() {
+export default function Signin1() {
   const [submitError, setSubmitError] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const navigate = useNavigate();
 
   const validationSchema = Yup.object().shape({
-    name: Yup.string().required("Name is required"),
     email: Yup.string()
       .email("Invalid email format")
       .required("Email is required"),
     password: Yup.string()
       .required("Password is required")
       .min(8, "Password must be at least 8 characters long"),
-    confirmPassword: Yup.string()
-      .required("Confirm Password is required")
-      .oneOf([Yup.ref("password"), null], "Passwords must match"),
   });
 
   const handleSubmit = async (values, { resetForm }) => {
+    // console.log("Form values:", values);
     setIsSubmitting(true);
     setSubmitError("");
 
     try {
-      const { name, email, password } = values;
-      const res = await registerUser({ name, email, password });
-      console.log("Registration successful:", res.data);
+      const email = values.email;
+      const password = values.password;
+
+      const res = await loginUser({ email, password });
+      localStorage.setItem("token", res.data.token);
+      console.log("Signin successful:", res.data);
       resetForm();
-      // Optionally redirect or show success message
+      navigate("/admin");
     } catch (error) {
-      console.error("Registration error:", error);
+      console.error("Signin error:", error);
       setSubmitError(
-        error.response?.data?.message ||
-          "Registration failed. Please try again."
+        error.response?.data?.message || "Signin failed. Please try again."
       );
     } finally {
       setIsSubmitting(false);
@@ -52,7 +53,7 @@ export default function SignUp() {
 
   return (
     <div className="w-full md:w-74 mx-auto shadow-lg p-4 mt-10 bg-white rounded-lg">
-      <h3 className="mb-4 border-b border-gray-200 pb-2">Sign Up</h3>
+      <h3 className="mb-4 border-b border-gray-200 pb-2">Sign In</h3>
 
       {submitError && (
         <Message severity="error" text={submitError} className="mb-4" />
@@ -60,10 +61,8 @@ export default function SignUp() {
 
       <Formik
         initialValues={{
-          name: "",
           email: "",
           password: "",
-          confirmPassword: "",
         }}
         validationSchema={validationSchema}
         onSubmit={handleSubmit}
@@ -77,26 +76,6 @@ export default function SignUp() {
           handleSubmit,
         }) => (
           <form className="flex flex-col gap-4" onSubmit={handleSubmit}>
-            <div className="flex flex-col gap-2">
-              <label htmlFor="name" className="font-medium">
-                Name
-              </label>
-              <InputText
-                id="name"
-                name="name"
-                value={values.name}
-                onChange={handleChange}
-                onBlur={handleBlur}
-                placeholder="Enter your name"
-                className={classNames({
-                  "p-invalid": isFormFieldInvalid("name", errors, touched),
-                })}
-              />
-              {isFormFieldInvalid("name", errors, touched) && (
-                <Message severity="error" text={errors.name} />
-              )}
-            </div>
-
             <div className="flex flex-col gap-2">
               <label htmlFor="email" className="font-medium">
                 Email
@@ -139,35 +118,9 @@ export default function SignUp() {
               )}
             </div>
 
-            <div className="flex flex-col gap-2">
-              <label htmlFor="confirmPassword" className="font-medium">
-                Confirm Password
-              </label>
-              <Password
-                id="confirmPassword"
-                name="confirmPassword"
-                value={values.confirmPassword}
-                onChange={handleChange}
-                onBlur={handleBlur}
-                toggleMask
-                placeholder="Confirm your password"
-                className={classNames({
-                  "p-invalid": isFormFieldInvalid(
-                    "confirmPassword",
-                    errors,
-                    touched
-                  ),
-                })}
-                feedback={false}
-              />
-              {isFormFieldInvalid("confirmPassword", errors, touched) && (
-                <Message severity="error" text={errors.confirmPassword} />
-              )}
-            </div>
-
             <Button
               type="submit"
-              label="Sign Up"
+              label="Sign In"
               loading={isSubmitting}
               disabled={isSubmitting}
               className="mt-2"
