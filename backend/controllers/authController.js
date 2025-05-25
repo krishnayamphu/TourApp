@@ -4,10 +4,14 @@ const User = require("../models/userModel");
 const appError = require("../utils/appError");
 
 // Helper to sign JWT
-const signToken = (userId) => {
-  return jwt.sign({ id: userId }, process.env.JWT_SECRET_KEY, {
-    expiresIn: process.env.JWT_EXPIRES_IN,
-  });
+const signToken = (user) => {
+  return jwt.sign(
+    { id: user.id, role: user.role },
+    process.env.JWT_SECRET_KEY,
+    {
+      expiresIn: process.env.JWT_EXPIRES_IN,
+    }
+  );
 };
 
 // Login a user
@@ -19,7 +23,7 @@ exports.login = async (req, res, next) => {
     if (!user) return next(appError("Invalid email", 401));
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) return next(appError("Invalid password", 401));
-    const token = signToken(user.id);
+    const token = signToken(user);
 
     res.status(200).json({
       status: "success",

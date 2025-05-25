@@ -26,6 +26,8 @@ const Signin = () => {
       dispatch({ type: "LOGIN_SUCCESS", payload: token });
 
       const role = JSON.parse(atob(token.split(".")[1])).role;
+      const payload = JSON.parse(atob(token.split(".")[1]));
+      console.log("JWT payload:", payload);
       if (role === "admin") {
         navigate("/admin");
       } else if (role === "user") {

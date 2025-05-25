@@ -12,30 +12,22 @@ import RoleProtectedRoute from "../components/auth/RoleProtectedRoute";
 const Routers = () => {
   return (
     <Routes>
+      {/* Public Layout */}
       <Route path="/" element={<AppLayout />}>
         <Route index element={<Home />} />
-        <Route path="/signup" element={<SignUp />} />
-        <Route path="/signin" element={<Signin />} />
+        <Route path="signup" element={<SignUp />} />
+        <Route path="signin" element={<Signin />} />
       </Route>
 
-      {/* <Route path="/unauthorized" element={<Unauthorized />} /> */}
+      {/* Optional Unauthorized Route */}
+      <Route path="/unauthorized" element={<div>Unauthorized Access</div>} />
 
-      {/* <Route element={<RoleProtectedRoute allowedRoles={["user"]} />}>
-        <Route path="/dashboard" element={<UserDashboard />} />
-      </Route> */}
-
-      {/* Admin routes - all protected */}
-      <Route
-        path="/admin"
-        element={
-          <RoleProtectedRoute allowedRoles={["admin"]}>
-            <AdminLayout />
-          </RoleProtectedRoute>
-        }
-      >
-        <Route index element={<AdminDashboard />} />
-        <Route path="tours" element={<Tours />} />
-        {/* <Route path="users" element={<Users />} /> */}
+      {/* Protected Admin Layout */}
+      <Route element={<RoleProtectedRoute allowedRoles={["admin"]} />}>
+        <Route path="/admin" element={<AdminLayout />}>
+          <Route index element={<AdminDashboard />} />
+          <Route path="tours" element={<Tours />} />
+        </Route>
       </Route>
     </Routes>
   );

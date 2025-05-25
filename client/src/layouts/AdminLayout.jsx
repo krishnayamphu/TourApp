@@ -1,44 +1,59 @@
-import { Link, Outlet } from "react-router-dom";
+import { Outlet, useNavigate } from "react-router-dom";
 import { Menubar } from "primereact/menubar";
 import { PanelMenu } from "primereact/panelmenu";
 
-export default function AppLayout() {
-  const items = [
+export default function AdminLayout() {
+  const navigate = useNavigate();
+
+  // Top navigation (account-related)
+  const topNavItems = [
     {
-      label: "Home",
+      label: "Admin Dashboard",
       icon: "pi pi-home",
-      url: "/unstyled",
+      command: () => navigate("/admin"),
     },
     {
-      label: "Programmatic",
-      icon: "pi pi-link",
-      url: "/unstyled",
-    },
-    {
-      label: "",
-      icon: "pi pi-user",
-      items: [
-        {
-          label: "Sign In",
-          url: "signin",
-        },
-        {
-          label: "Sign Up",
-          url: "signup",
-        },
-      ],
+      label: "Logout",
+      icon: "pi pi-sign-out",
+      command: () => {
+        localStorage.removeItem("user"); // Or dispatch logout
+        navigate("/signin");
+      },
     },
   ];
+
+  // Sidebar navigation (admin section links)
+  const sideNavItems = [
+    {
+      label: "Dashboard",
+      icon: "pi pi-chart-bar",
+      routerLink: "/admin",
+    },
+    {
+      label: "Tours",
+      icon: "pi pi-map-marker",
+      routerLink: "/admin/tours",
+    },
+    {
+      label: "Users",
+      icon: "pi pi-users",
+      routerLink: "/admin/users",
+    },
+  ];
+
   return (
     <>
       <header className="bg-sky-500">
         <div className="container mx-auto">
-          <Menubar model={items} />
+          <Menubar model={topNavItems} />
         </div>
       </header>
-      <main>
-        <div className="card flex">
-          <PanelMenu model={items} className="w-full md:w-20rem" />
+
+      <main className="flex p-4 gap-4">
+        <div className="w-64">
+          <PanelMenu model={sideNavItems} className="w-full" />
+        </div>
+        <div className="flex-1">
           <Outlet />
         </div>
       </main>
