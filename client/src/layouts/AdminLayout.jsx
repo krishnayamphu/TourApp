@@ -1,9 +1,29 @@
+import { useContext } from "react";
 import { Outlet, useNavigate } from "react-router-dom";
+import { AuthContext } from "../context/AuthContext";
 import { Menubar } from "primereact/menubar";
 import { PanelMenu } from "primereact/panelmenu";
+import ProfileDropdown from "../components/ProfileDropdown";
 
 export default function AdminLayout() {
   const navigate = useNavigate();
+  const { dispatch } = useContext(AuthContext);
+  const handleSignOut = () => {
+    dispatch({ type: "LOGOUT" });
+    console.log("Signing out...");
+  };
+  const start = (
+    <img
+      alt="logo"
+      src="https://primefaces.org/cdn/primereact/images/logo.png"
+      className="h-8 mr-2"
+    ></img>
+  );
+  const end = (
+    <div className="flex align-items-center gap-2">
+      <ProfileDropdown onSignOut={handleSignOut} />
+    </div>
+  );
 
   // Top navigation (account-related)
   const topNavItems = [
@@ -11,14 +31,6 @@ export default function AdminLayout() {
       label: "Admin Dashboard",
       icon: "pi pi-home",
       command: () => navigate("/admin"),
-    },
-    {
-      label: "Logout",
-      icon: "pi pi-sign-out",
-      command: () => {
-        localStorage.removeItem("user"); // Or dispatch logout
-        navigate("/signin");
-      },
     },
   ];
 
@@ -48,17 +60,20 @@ export default function AdminLayout() {
 
   return (
     <>
-      <header className="bg-sky-500">
-        <div className="container mx-auto">
-          <Menubar model={topNavItems} />
-        </div>
+      <header className="bg-gray-500">
+        <Menubar
+          className="rounded-none!"
+          model={topNavItems}
+          start={start}
+          end={end}
+        />
       </header>
 
       <main className="flex gap-4">
         <div className="w-64 p-2 bg-gray-100 min-h-screen">
           <PanelMenu model={sideNavItems} className="w-full" />
         </div>
-        <div className="flex-1">
+        <div className="flex-1 p-4">
           <Outlet />
         </div>
       </main>

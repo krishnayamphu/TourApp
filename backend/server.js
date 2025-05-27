@@ -1,6 +1,7 @@
 require("dotenv").config();
 const express = require("express");
 const cors = require("cors");
+const path = require("path");
 const globalErrorHandler = require("./middlewares/error");
 
 const authRoutes = require("./routes/authRoutes");
@@ -23,6 +24,7 @@ sequelize
   .catch((err) => console.error("Sync error:", err));
 
 // api routes
+app.use("/api/uploads", express.static(path.join(__dirname, "uploads")));
 app.use("/api/auth", authRoutes);
 app.use("/api/users", userRoutes);
 app.use("/api/tours", tourRoutes);

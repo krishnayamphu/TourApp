@@ -11,10 +11,10 @@ const {
 } = require("../controllers/tourController");
 
 /* public routes */
-
 router.get("/reviews", getTourReviews);
 router.get("/:id", getTour);
 router.get("/", getAllTours);
+
 /* admin routes */
 router.post(
   "/",
