@@ -83,7 +83,7 @@ export default function Tours() {
           label="New Tour"
           icon="pi pi-plus"
           severity="success"
-          onClick={() => navigate(`/tours/create`)}
+          onClick={() => navigate(`/admin/tours/create`)}
         />
       </div>
     );

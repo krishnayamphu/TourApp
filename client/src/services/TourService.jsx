@@ -1,15 +1,31 @@
 import axios from "axios";
 
 const API = import.meta.env.VITE_API_URL || "http://localhost:3000/api";
-
+const token = localStorage.getItem("token");
 //get tours
 export const getTours = async () => {
   return axios.get(`${API}/tours`);
 };
 
-//get tours
+//get tour by id
+export const getTour = async (tourId) => {
+  return axios.get(`${API}/tours/${tourId}`);
+};
+
+//get tour by slug
+export const getTourBySlug = async (slug) => {
+  return axios.get(`${API}/tours/slug/${slug}`);
+};
+
+//crate a tour
+export const createTour = async (tourData) => {
+  return axios.post(`${API}/tours`, tourData, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+};
+
+//delete a tour
 export const deleteTour = async (id) => {
-  const token = localStorage.getItem("token");
   return axios.delete(`${API}/tours/${id}`, {
     headers: { Authorization: `Bearer ${token}` },
   });

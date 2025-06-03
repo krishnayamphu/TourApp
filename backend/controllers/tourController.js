@@ -27,7 +27,8 @@ exports.uploadAvatar = async (req, res, next) => {
 // Get all tours
 exports.getAllTours = async (req, res, next) => {
   try {
-    const tours = await Tour.findAll();
+    const isActive = true;
+    const tours = await Tour.findAll({ where: { isActive } });
 
     res.status(200).json({
       status: "success",
@@ -43,7 +44,36 @@ exports.getAllTours = async (req, res, next) => {
 exports.getTour = async (req, res, next) => {
   try {
     const tour = await Tour.findByPk(req.params.id);
+    const reviews = await tour.getReviews();
 
+    if (!tour) return next(appError("Tour not found", 404));
+    console.log("reviews:", reviews);
+    res.status(200).json({
+      status: "success",
+      tour,
+      reviews,
+    });
+  } catch (err) {
+    next(err);
+  }
+};
+
+// Get tour by slug
+exports.getTourBySlug = async (req, res, next) => {
+  try {
+    console.log("req.params.slug:", req.params.slug);
+    const tour = await Tour.findOne({
+      where: {
+        slug: req.params.slug,
+      },
+      include: [
+        {
+          // Eager load the reviews in the same query
+          model: Review,
+          as: "reviews", // Use whatever alias you defined in your association
+        },
+      ],
+    });
     res.status(200).json({
       status: "success",
       tour,

@@ -1,36 +1,52 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { Rating } from "primereact/rating";
 import { Button } from "primereact/button";
-import { Dropdown } from "primereact/dropdown";
-import { Knob } from "primereact/knob";
+import { getTours } from "../services/TourService";
+
 export default function Home() {
-  const [selectedCity, setSelectedCity] = useState(null);
-  const cities = [
-    { name: "New York", code: "NY" },
-    { name: "Rome", code: "RM" },
-    { name: "London", code: "LDN" },
-    { name: "Istanbul", code: "IST" },
-    { name: "Paris", code: "PRS" },
-  ];
-  const [value, setValue] = useState(0);
+  const API = import.meta.env.VITE_API_URL || "http://localhost:3000/api";
+  const navigate = useNavigate();
+  const [tours, setTours] = useState([]);
+  useEffect(() => {
+    fetchTours();
+  }, []);
+
+  const fetchTours = () => {
+    getTours()
+      .then((res) => setTours(res.data.tours))
+      .catch((error) => console.error("Error fetching tours:", error));
+  };
   return (
     <>
-      <div className="container mx-auto">
+      <div className="w-5/6 mx-auto">
         <h1 className="text-2xl font-bold text-emerald-600 py-4">
           Welcome to Homepage
         </h1>
-        <Button label="Check" icon="pi pi-check" />
 
-        <div className="card flex justify-content-center w-[200px]">
-          <Dropdown
-            value={selectedCity}
-            onChange={(e) => setSelectedCity(e.value)}
-            options={cities}
-            optionLabel="name"
-            placeholder="Select a City"
-            className="w-full md:w-14rem"
-          />
-
-          <Knob value={value} onChange={(e) => setValue(e.value)} />
+        <div className="grid grid-cols-4">
+          {tours.map((tour, index) => (
+            <div className="shadow rounded" key={index}>
+              <img
+                src={`${API}/uploads/${tour.coverImage}`}
+                alt={tour.coverImage}
+                className="rounded-t"
+              />
+              <div className="flex flex-col items-center gap-2 p-4">
+                <h3>{tour.title}</h3>
+                <Rating value={tour.ratingsAverage} readOnly cancel={false} />
+                <div className="flex gap-4 font-bold">
+                  <span>${tour.priceDiscount}</span>
+                  <span className="line-through">${tour.price}</span>
+                </div>
+                <Button
+                  label="More Details"
+                  severity="secondary"
+                  onClick={() => navigate(`/tour/${tour.slug}`)}
+                />
+              </div>
+            </div>
+          ))}
         </div>
       </div>
     </>

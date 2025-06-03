@@ -14,6 +14,7 @@ Review.belongsTo(User, {
 });
 
 Tour.hasMany(Review, {
+  as: "reviews",
   foreignKey: { name: "tourId", allowNull: false },
   onDelete: "CASCADE",
 });

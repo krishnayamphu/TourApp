@@ -30,6 +30,22 @@ exports.getReview = async (req, res, next) => {
   }
 };
 
+// Get review by TourID
+exports.getReviewsByTourId = async (req, res, next) => {
+  try {
+    const tourId = req.params.tourId;
+    const reviews = await Review.findAll({ where: { tourId } });
+
+    res.status(200).json({
+      status: "success",
+      results: reviews.length,
+      reviews,
+    });
+  } catch (err) {
+    next(err);
+  }
+};
+
 // create a review
 exports.saveReview = async (req, res, next) => {
   const { tourId, userId, review, rating } = req.body;
