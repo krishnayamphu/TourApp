@@ -1,12 +1,16 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useParams } from "react-router-dom";
-import { InputText } from "primereact/inputtext";
 import { Rating } from "primereact/rating";
+import { InputTextarea } from "primereact/inputtextarea";
 import { Divider } from "primereact/divider";
 import { Button } from "primereact/button";
 import { Dialog } from "primereact/dialog";
-
+import { Message } from "primereact/message";
 import { getTourBySlug } from "../services/TourService";
+import { Formik } from "formik";
+import * as Yup from "yup";
+import { Toast } from "primereact/toast";
+import { createReview } from "../services/ReviewService";
 
 export default function Tour() {
   const API = import.meta.env.VITE_API_URL || "http://localhost:3000/api";
@@ -16,6 +20,10 @@ export default function Tour() {
   const [parsedStartDates, setParsedStartDates] = useState([]);
   const [visible, setVisible] = useState(false);
   const { slug } = useParams();
+
+  const toast = useRef(null);
+  const [submitError, setSubmitError] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
     fetchTour(slug);
@@ -64,8 +72,46 @@ export default function Tour() {
     }
   };
 
+  const validationSchema = Yup.object().shape({
+    rating: Yup.number()
+      .min(1, "Please select at least 1 star")
+      .required("Rating is required"),
+    review: Yup.string().required("review is required"),
+  });
+
+  const handleSubmit = async (values, { resetForm }) => {
+    setIsSubmitting(true);
+    setSubmitError("");
+
+    try {
+      const { tourId, userId, rating, review } = values;
+      // const res = await createReview({
+      //   tourId,
+      //   userId,
+      //   rating,
+      //   review,
+      // });
+      console.log("values:", values);
+      resetForm();
+      // Optionally redirect or show success message
+    } catch (error) {
+      console.error("Save error:", error);
+      setSubmitError(
+        error.response?.data?.message || "Tour save failed. Please try again."
+      );
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const isFormFieldInvalid = (name, errors) => !!errors[name];
+
   return (
     <>
+      <Toast ref={toast} />
+      {submitError && (
+        <Message severity="error" text={submitError} className="mb-4" />
+      )}
       <div className="w-5/6 mx-auto py-8">
         <div className="grid grid-cols-1 lg:grid-cols-12">
           <div className="lg:col-span-9 bg-green-100 lg:pe-4">
@@ -140,12 +186,16 @@ export default function Tour() {
               </div>
               <Divider />
               <div>
-                <h4 className="font-bold">Reviews( {tour.ratingsQuantity})</h4>
-                <Button
-                  label="Login"
-                  icon="pi pi-user"
-                  onClick={() => setVisible(true)}
-                />
+                <div className="flex justify-between justify-between items-center">
+                  <h4 className="font-bold">
+                    Reviews( {tour.ratingsQuantity})
+                  </h4>
+                  <Button
+                    label="Write a Review"
+                    className="p-button-outlined p-button-secondary"
+                    onClick={() => setVisible(true)}
+                  />
+                </div>
                 <Divider />
                 {tour.reviews?.map((review) => (
                   <div key={review.id}>
@@ -163,7 +213,6 @@ export default function Tour() {
         </div>
       </div>
 
-      {/* Dialog component remains the same */}
       <Dialog
         visible={visible}
         modal
@@ -177,10 +226,77 @@ export default function Tour() {
             style={{
               borderRadius: "12px",
               backgroundImage:
-                "radial-gradient(circle at left top, var(--primary-400), var(--primary-700))",
+                "linear-gradient(90deg, var(--primary-100), var(--primary-100))",
             }}
           >
-            {/* ... existing dialog content ... */}
+            <Formik
+              initialValues={{
+                tourId: 1,
+                userId: 1,
+                rating: 0,
+                review: "",
+              }}
+              validationSchema={validationSchema}
+              onSubmit={handleSubmit}
+            >
+              {({ values, errors, handleChange, handleSubmit }) => (
+                <form className="flex flex-col gap-4" onSubmit={handleSubmit}>
+                  <div className="flex flex-col gap-2">
+                    <label
+                      htmlFor="rating"
+                      className="text-primary-50 font-semibold"
+                    >
+                      Rating
+                    </label>
+                    <Rating
+                      id="rating"
+                      name="rating"
+                      value={values.rating}
+                      onChange={handleChange}
+                      cancel={false}
+                    />
+                    {isFormFieldInvalid("rating", errors) && (
+                      <Message severity="error" text={errors.rating} />
+                    )}
+                  </div>
+                  <div className="flex flex-col gap-2">
+                    <label
+                      htmlFor="reviewMessage"
+                      className="text-primary-50 font-semibold"
+                    >
+                      Review Message
+                    </label>
+                    <InputTextarea
+                      id="review"
+                      name="review"
+                      value={values.review}
+                      placeholder="Write your review here..."
+                      onChange={handleChange}
+                      rows={5}
+                      cols={30}
+                    />
+                    {isFormFieldInvalid("review", errors) && (
+                      <Message severity="error" text={errors.review} />
+                    )}
+                  </div>
+                  <div className="flex align-items-center gap-2">
+                    <Button
+                      type="submit"
+                      label="Submit"
+                      loading={isSubmitting}
+                      disabled={isSubmitting}
+                      className="p-3 w-full text-primary-50 border-1 border-white-alpha-30 hover:bg-white-alpha-10"
+                    ></Button>
+                    <Button
+                      label="Cancel"
+                      onClick={(e) => hide(e)}
+                      text
+                      className="p-3 w-full text-primary-50 border-1 border-white-alpha-30 hover:bg-white-alpha-10"
+                    ></Button>
+                  </div>
+                </form>
+              )}
+            </Formik>
           </div>
         )}
       ></Dialog>
