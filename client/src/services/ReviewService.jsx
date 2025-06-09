@@ -5,6 +5,7 @@ const token = localStorage.getItem("token");
 
 //crate a tour
 export const createReview = async (reviewData) => {
+  if (!token) return "token not set";
   return axios.post(`${API}/reviews`, reviewData, {
     headers: { Authorization: `Bearer ${token}` },
   });

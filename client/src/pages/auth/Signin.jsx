@@ -31,7 +31,7 @@ const Signin = () => {
       if (role === "admin") {
         navigate("/admin");
       } else if (role === "user") {
-        navigate("/dashboard");
+        navigate("/my-booking");
       } else {
         navigate("/unauthorized");
       }

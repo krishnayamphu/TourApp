@@ -7,6 +7,7 @@ const globalErrorHandler = require("./middlewares/error");
 const authRoutes = require("./routes/authRoutes");
 const userRoutes = require("./routes/userRoutes");
 const tourRoutes = require("./routes/tourRoutes");
+const bookingRoutes = require("./routes/bookingRoutes");
 const reviewRoutes = require("./routes/reviewRoutes");
 
 const app = express();
@@ -28,6 +29,8 @@ app.use("/api/uploads", express.static(path.join(__dirname, "uploads")));
 app.use("/api/auth", authRoutes);
 app.use("/api/users", userRoutes);
 app.use("/api/tours", tourRoutes);
+app.use("/api/bookings", bookingRoutes);
+
 app.use("/api/reviews", reviewRoutes);
 
 app.use(globalErrorHandler);

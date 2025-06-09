@@ -1,5 +1,5 @@
 import { useEffect, useState, useRef } from "react";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { Rating } from "primereact/rating";
 import { InputTextarea } from "primereact/inputtextarea";
 import { Divider } from "primereact/divider";
@@ -11,6 +11,7 @@ import { Formik } from "formik";
 import * as Yup from "yup";
 import { Toast } from "primereact/toast";
 import { createReview } from "../services/ReviewService";
+import { useAuth } from "../utils/useAuth";
 
 export default function Tour() {
   const API = import.meta.env.VITE_API_URL || "http://localhost:3000/api";
@@ -20,13 +21,15 @@ export default function Tour() {
   const [parsedStartDates, setParsedStartDates] = useState([]);
   const [visible, setVisible] = useState(false);
   const { slug } = useParams();
-
+  const { token, user } = useAuth();
+  const navigate = useNavigate();
   const toast = useRef(null);
   const [submitError, setSubmitError] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
     fetchTour(slug);
+    console.log("user:", user);
   }, [slug]);
 
   const fetchTour = async (slug) => {
@@ -79,20 +82,35 @@ export default function Tour() {
     review: Yup.string().required("review is required"),
   });
 
+  const auth = () => {
+    if (!token) {
+      alert("please login first");
+      navigate(`/signin`);
+    } else {
+      setVisible(true);
+    }
+  };
+
   const handleSubmit = async (values, { resetForm }) => {
     setIsSubmitting(true);
     setSubmitError("");
 
     try {
       const { tourId, userId, rating, review } = values;
-      // const res = await createReview({
-      //   tourId,
-      //   userId,
-      //   rating,
-      //   review,
-      // });
-      console.log("values:", values);
+      const res = await createReview({
+        tourId,
+        userId,
+        rating,
+        review,
+      });
+      console.log(res);
+      setVisible(false);
       resetForm();
+      toast.current.show({
+        severity: "info",
+        summary: "Success",
+        detail: "Review submitted successfully",
+      });
       // Optionally redirect or show success message
     } catch (error) {
       console.error("Save error:", error);
@@ -193,21 +211,35 @@ export default function Tour() {
                   <Button
                     label="Write a Review"
                     className="p-button-outlined p-button-secondary"
-                    onClick={() => setVisible(true)}
+                    onClick={auth}
                   />
                 </div>
                 <Divider />
-                {tour.reviews?.map((review) => (
-                  <div key={review.id}>
-                    <p>{review.review}</p>
-                    <p>{review.rating}</p>
-                  </div>
-                )) ?? <p>No reviews yet</p>}
+                {tour.reviews?.length > 0 ? (
+                  tour.reviews.map((review) => (
+                    <div key={review.id} className="mb-4 border-b pb-2">
+                      <div className="flex items-center gap-2">
+                        <strong>{review.user?.name || "Anonymous"}</strong>
+                        <Rating value={review.rating} readOnly cancel={false} />
+                      </div>
+                      <p className="text-gray-700">{review.review}</p>
+                    </div>
+                  ))
+                ) : (
+                  <p>No reviews yet</p>
+                )}
               </div>
             </div>
           </div>
 
           <div className="lg:col-span-3 bg-blue-100">
+            <Button
+              label="Book Now"
+              severity="success"
+              onClick={() => navigate(`/booking/${tour.id}`)}
+              className="p-3 w-full"
+            ></Button>
+
             <h3>Popular Tours</h3>
           </div>
         </div>
@@ -231,8 +263,8 @@ export default function Tour() {
           >
             <Formik
               initialValues={{
-                tourId: 1,
-                userId: 1,
+                tourId: tour.id,
+                userId: user?.id,
                 rating: 0,
                 review: "",
               }}

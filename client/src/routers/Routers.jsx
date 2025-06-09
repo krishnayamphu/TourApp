@@ -12,6 +12,8 @@ import RoleProtectedRoute from "../components/auth/RoleProtectedRoute";
 import Users from "../pages/admin/users/Users";
 import Bookings from "../pages/admin/bookings/Bookings";
 import Tour from "../pages/Tour";
+import Booking from "../pages/booking/Booking";
+import MyBooking from "../pages/MyBooking";
 
 const Routers = () => {
   return (
@@ -28,6 +30,14 @@ const Routers = () => {
 
       {/* Optional Unauthorized Route */}
       <Route path="/unauthorized" element={<div>Unauthorized Access</div>} />
+
+      {/* Protected Layout */}
+      <Route element={<RoleProtectedRoute allowedRoles={["admin", "user"]} />}>
+        <Route path="/" element={<AppLayout />}>
+          <Route path="my-booking" element={<MyBooking />} />
+          <Route path="booking/:id" element={<Booking />} />
+        </Route>
+      </Route>
 
       {/* Protected Admin Layout */}
       <Route element={<RoleProtectedRoute allowedRoles={["admin"]} />}>

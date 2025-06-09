@@ -49,28 +49,35 @@ exports.getReviewsByTourId = async (req, res, next) => {
 // create a review
 exports.saveReview = async (req, res, next) => {
   const { tourId, userId, review, rating } = req.body;
-
-  try {
-    const newReview = await Review.create({
-      tourId,
-      userId,
-      review,
-      rating,
-    });
-
+  const rev = await Review.findOne({ where: { tourId, userId } });
+  if (rev) {
     res.status(201).json({
       status: "success",
-      message: "Review created",
-      review: {
-        id: newReview.id,
-        tourId: newReview.tourId,
-        userId: newReview.userId,
-        review: newReview.review,
-        rating: newReview.rating,
-      },
+      message: "Already Review",
     });
-  } catch (err) {
-    next(err);
+  } else {
+    try {
+      const newReview = await Review.create({
+        tourId,
+        userId,
+        review,
+        rating,
+      });
+
+      res.status(201).json({
+        status: "success",
+        message: "Review created",
+        review: {
+          id: newReview.id,
+          tourId: newReview.tourId,
+          userId: newReview.userId,
+          review: newReview.review,
+          rating: newReview.rating,
+        },
+      });
+    } catch (err) {
+      next(err);
+    }
   }
 };
 
