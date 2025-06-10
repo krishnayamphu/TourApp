@@ -125,6 +125,32 @@ exports.updateBooking = async (req, res, next) => {
   }
 };
 
+// Update booking status
+exports.updateBookingStatus = async (req, res, next) => {
+  const { status } = req.body;
+
+  try {
+    const booking = await Booking.findByPk(req.params.id);
+    if (!booking) return next(appError("booking not found", 404));
+
+    booking.status = status || booking.status;
+    await booking.save();
+
+    res.status(200).json({
+      status: "success",
+      bookingUpdate: {
+        id: booking.id,
+        tourId: booking.tourId,
+        userId: booking.userId,
+        price: booking.price,
+        date: booking.date,
+        participants: booking.participants,
+      },
+    });
+  } catch (err) {
+    next(err);
+  }
+};
 // Delete a booking (deactivate or delete)
 exports.deleteBooking = async (req, res, next) => {
   try {

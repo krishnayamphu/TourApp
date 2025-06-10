@@ -1,30 +1,23 @@
-import axios from "axios";
-import { useContext, useEffect, useRef, useState } from "react";
-import { useNavigate } from "react-router-dom";
-import { Toolbar } from "primereact/toolbar";
+import { useEffect, useRef, useState } from "react";
 import { Dropdown } from "primereact/dropdown";
 import { Button } from "primereact/button";
 import { Message } from "primereact/message";
 import { DataTable } from "primereact/datatable";
 import { Column } from "primereact/column";
 import { Dialog } from "primereact/dialog";
-import { Toast } from "primereact/toast";
 import { Formik } from "formik";
 import * as Yup from "yup";
-
-import { useAuth } from "../../../utils/useAuth";
+import { Toast } from "primereact/toast";
 import { getTours } from "../../../services/TourService";
 import {
   getBooking,
   getBookings,
-  updateBooking,
+  updateBookingStatus,
 } from "../../../services/BookingService";
 
 export default function Bookings() {
   const API = import.meta.env.VITE_API_URL || "http://localhost:3000/api";
   const toast = useRef(null);
-  const navigate = useNavigate();
-  const { token, user } = useAuth();
   const [visible, setVisible] = useState(false);
   const [tours, setTours] = useState([]);
   const [bookings, setBookings] = useState([]);
@@ -33,7 +26,6 @@ export default function Bookings() {
   const [submitError, setSubmitError] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const [selectedStatus, setSelectedStatus] = useState(null);
   const statusList = [
     { name: "Pending", code: "pending" },
     { name: "Processing", code: "processing" },
@@ -44,13 +36,11 @@ export default function Bookings() {
   useEffect(() => {
     fetchTours();
     fetchBookings();
-    console.log("user:", user);
   }, []);
 
   const fetchTours = () => {
     getTours()
       .then((res) => {
-        console.log("tours fetched:", res.data.tours);
         setTours(res.data.tours);
       })
       .catch((error) => console.error("Error fetching tours:", error));
@@ -59,7 +49,6 @@ export default function Bookings() {
   const fetchBookings = () => {
     getBookings()
       .then((res) => {
-        console.log("bookings fetched:", res.data.bookings);
         setBookings(res.data.bookings);
       })
       .catch((error) => console.error("Error fetching bookings:", error));
@@ -69,17 +58,23 @@ export default function Bookings() {
     status: Yup.string().required("status is required"),
   });
 
-  const statusBodyTemplate = (tour) => {
+  const statusBodyTemplate = (booking) => {
     return (
-      <Message
-        severity={getSeverity(tour)}
-        text={tour.isActive ? "active" : "disabled"}
-      />
+      <Message severity={getSeverity(booking.status)} text={booking.status} />
     );
   };
 
-  const getSeverity = (tour) => {
-    return tour.status === "pending" ? "warning" : "error";
+  const getSeverity = (status) => {
+    switch (status) {
+      case "pending":
+        return "warn";
+      case "paid":
+        return "success";
+      case "cancelled":
+        return "error";
+      default:
+        return "info";
+    }
   };
 
   const actionBodyTemplate = (booking) => {
@@ -91,20 +86,17 @@ export default function Bookings() {
           severity="primary"
           onClick={() => confirm(booking.id)}
         />
-        {/* <Button
-          label=""
-          icon="pi pi-pencil"
-          onClick={() => navigate(`/my-booking/edit/${booking.id}`)}
-        /> */}
       </div>
     );
   };
 
   const confirm = (id) => {
     updateIdRef.current = id; // store ID to use later
+    console.log("Booking ID to update:", id);
     getBooking(id)
       .then((res) => {
         setBooking(res.data.booking);
+        console.log(booking);
         setVisible(true);
       })
       .catch((err) => {
@@ -118,8 +110,12 @@ export default function Bookings() {
       });
   };
 
-  const handleSubmit = async (id) => {
-    updateBooking(id)
+  const handleSubmit = async (values) => {
+    console.log("values: ", values);
+    const id = booking.id;
+    const status = values.status;
+    console.log("id is:", id);
+    updateBookingStatus(id, status)
       .then((res) => {
         toast.current.show({
           severity: "success",
@@ -129,6 +125,7 @@ export default function Bookings() {
         });
         console.log(res);
         fetchBookings();
+        setVisible(false);
       })
       .catch((err) => {
         console.log(err);
@@ -145,8 +142,13 @@ export default function Bookings() {
 
   return (
     <div className="p-4">
+      <Toast ref={toast} />
       <h1>All Bookings</h1>
-      <DataTable value={bookings} tableStyle={{ minWidth: "50rem" }}>
+      <DataTable
+        value={bookings}
+        dataKey="id"
+        tableStyle={{ minWidth: "50rem" }}
+      >
         <Column field="id" header="SN"></Column>
         <Column
           header="Tour Name"
@@ -158,7 +160,7 @@ export default function Bookings() {
         <Column field="price" header="Price"></Column>
         <Column field="participants" header="Participants"></Column>
         <Column field="date" header="Date"></Column>
-        <Column field="status" header="Status"></Column>
+        <Column header="Status" body={statusBodyTemplate}></Column>
         <Column header="Action" body={actionBodyTemplate}></Column>
       </DataTable>
 
@@ -168,6 +170,8 @@ export default function Bookings() {
         onHide={() => {
           if (!visible) return;
           setVisible(false);
+          setBooking({});
+          updateIdRef.current = null;
         }}
         content={({ hide }) => (
           <div
@@ -179,14 +183,15 @@ export default function Bookings() {
             }}
           >
             <Formik
+              enableReinitialize
               initialValues={{
-                id: booking?.id,
-                status: booking?.status,
+                id: booking?.id || "",
+                status: booking?.status || "",
               }}
               validationSchema={validationSchema}
               onSubmit={handleSubmit}
             >
-              {({ values, errors, handleChange, handleSubmit }) => (
+              {({ values, errors, handleSubmit, setFieldValue }) => (
                 <form className="flex flex-col gap-4" onSubmit={handleSubmit}>
                   <div className="flex flex-col gap-2">
                     <label
@@ -196,15 +201,20 @@ export default function Bookings() {
                       Status
                     </label>
                     <Dropdown
-                      value={selectedStatus}
-                      onChange={(e) => setSelectedStatus(e.value)}
-                      options={statusList}
-                      optionLabel="name"
+                      id="status"
+                      name="status"
+                      value={values.status}
+                      onChange={(e) => setFieldValue("status", e.value)}
+                      options={statusList.map((s) => s.code)}
+                      optionLabel={(option) =>
+                        statusList.find((s) => s.code === option)?.name ||
+                        option
+                      }
                       placeholder="Select Status"
                       className="w-full md:w-14rem"
                     />
-                    {isFormFieldInvalid("Status", errors) && (
-                      <Message severity="error" text={errors.Status} />
+                    {isFormFieldInvalid("status", errors) && (
+                      <Message severity="error" text={errors.status} />
                     )}
                   </div>
 

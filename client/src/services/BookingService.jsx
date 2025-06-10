@@ -33,8 +33,23 @@ export const createBooking = async (bookingData) => {
 };
 
 //update booking by id
-export const updateBooking = async (bookingId) => {
-  return axios.put(`${API}/bookings/edit/${bookingId}`, {
-    headers: { Authorization: `Bearer ${token}` },
-  });
+export const updateBooking = async (bookingId, status) => {
+  return axios.put(
+    `${API}/bookings/status/${bookingId}`,
+    { status },
+    {
+      headers: { Authorization: `Bearer ${token}` },
+    }
+  );
+};
+
+//update booking status by id
+export const updateBookingStatus = async (bookingId, status) => {
+  return axios.put(
+    `${API}/bookings/status/${bookingId}`,
+    { status },
+    {
+      headers: { Authorization: `Bearer ${token}` },
+    }
+  );
 };

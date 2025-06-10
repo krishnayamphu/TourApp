@@ -7,6 +7,7 @@ const {
   getAllBookings,
   getBooking,
   getBookingsByUserId,
+  updateBookingStatus,
 } = require("../controllers/bookingController");
 
 /* protected routes */
@@ -15,5 +16,6 @@ router.get("/:id", protect, getBooking);
 router.get("/user/:id", protect, getBookingsByUserId);
 router.post("/", protect, saveBooking);
 router.put("/:id", protect, updateBooking);
+router.put("/status/:id", protect, updateBookingStatus);
 
 module.exports = router;
