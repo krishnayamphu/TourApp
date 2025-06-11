@@ -1,7 +1,6 @@
 import { useContext } from "react";
 import { Navigate, Outlet } from "react-router-dom";
 import { AuthContext } from "../../context/AuthContext";
-import { jwtDecode } from "jwt-decode";
 
 const RoleProtectedRoute = ({ allowedRoles }) => {
   const { user } = useContext(AuthContext);

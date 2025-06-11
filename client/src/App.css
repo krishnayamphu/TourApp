@@ -5,3 +5,10 @@
   --breakpoint-3xl: 120rem;
   --color-avocado-100: oklch(0.99 0 0);
 }
+
+#password input[type="password"] {
+  width: 382px;
+}
+#confirmPassword input[type="password"] {
+  width: 382px;
+}

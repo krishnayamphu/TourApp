@@ -1,39 +1,52 @@
-import { Link, Outlet } from "react-router-dom";
+import { useContext } from "react";
+import { Outlet, useNavigate } from "react-router-dom";
 import { Menubar } from "primereact/menubar";
-// import { useRouter } from "next/router";
+import { AuthContext } from "../context/AuthContext";
+import ProfileDropdown from "../components/ProfileDropdown";
+import AuthDropdown from "../components/auth/AuthDropdown";
+import UserProfileDropdown from "../components/UserProfileDropdown";
+
 export default function AppLayout() {
+  const navigate = useNavigate();
+  const { user, token, dispatch } = useContext(AuthContext);
+  const isAuthenticated = !!token; // Convert token to boolean
+
+  const handleSignOut = () => {
+    dispatch({ type: "LOGOUT" });
+    console.log("Signing out...");
+  };
+
   // const router = useRouter();
   const items = [
     {
       label: "Home",
       icon: "pi pi-home",
-      url: "/unstyled",
+      url: "/",
     },
     {
-      label: "Programmatic",
-      icon: "pi pi-link",
-      url: "/unstyled",
-    },
-    {
-      label: "",
-      icon: "pi pi-user",
-      items: [
-        {
-          label: "Sign In",
-          url: "signin",
-        },
-        {
-          label: "Sign Up",
-          url: "signup",
-        },
-      ],
+      label: "Tours",
+      url: "/",
     },
   ];
+
+  const end = (
+    <div className="flex align-items-center gap-2">
+      {isAuthenticated ? (
+        <UserProfileDropdown user={user} onSignOut={handleSignOut} />
+      ) : (
+        <AuthDropdown />
+      )}
+    </div>
+  );
   return (
     <>
-      <header className="bg-sky-500">
+      <header className="bg-[#f9fafb]! border border-[#e5e7eb]!">
         <div className="container mx-auto">
-          <Menubar model={items} />
+          <Menubar
+            className="rounded-none! border-none!"
+            model={items}
+            end={end}
+          />
         </div>
       </header>
       <main>
