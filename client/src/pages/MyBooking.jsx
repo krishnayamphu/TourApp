@@ -12,8 +12,7 @@ import { getTours } from "../services/TourService";
 import SideNav from "../components/SideNav";
 import {
   getBookingByUserId,
-  getBookings,
-  updateBooking,
+  updateBookingStatus,
 } from "../services/BookingService";
 
 export default function MyBooking() {
@@ -46,39 +45,44 @@ export default function MyBooking() {
       .catch((error) => console.error("Error fetching bookings:", error));
   };
 
-  const statusBodyTemplate = (tour) => {
+  const statusBodyTemplate = (booking) => {
     return (
-      <Message
-        severity={getSeverity(tour)}
-        text={tour.isActive ? "active" : "disabled"}
-      />
+      <Message severity={getSeverity(booking.status)} text={booking.status} />
     );
   };
 
-  const getSeverity = (tour) => {
-    return tour.status === "pending" ? "warning" : "error";
+  // const getSeverity = (tour) => {
+  //   return tour.status === "pending" ? "warning" : "error";
+  // };
+
+  const getSeverity = (status) => {
+    switch (status) {
+      case "pending":
+        return "warn";
+      case "paid":
+        return "success";
+      case "cancelled":
+        return "error";
+      default:
+        return "info";
+    }
   };
 
   const actionBodyTemplate = (booking) => {
     return (
       <div className="flex gap-2">
-        {booking.status === "pending" ? (
+        {
           <Button
-            label=""
-            icon="pi pi-pencil"
-            severity="primary"
+            label="Request Cancel"
+            icon="pi pi-times"
+            severity="danger"
+            outlined
             onClick={() => {
               confirm(booking.id);
             }}
+            disabled={booking.status !== "pending"}
           />
-        ) : (
-          ""
-        )}
-        <Button
-          label=""
-          icon="pi pi-pencil"
-          onClick={() => navigate(`/my-booking/edit/${booking.id}`)}
-        />
+        }
       </div>
     );
   };
@@ -87,29 +91,30 @@ export default function MyBooking() {
     updateIdRef.current = id; // store ID to use later
 
     confirmDialog({
-      message: "Do you want to delete this record?",
-      header: "Delete Confirmation",
+      message: "Do you want to cancel this booking?",
+      header: "Cancel Confirmation",
       icon: "pi pi-info-circle",
       acceptClassName: "p-button-danger",
-      accept: () => handleDeleteTour(updateIdRef.current),
+      accept: () => handleSubmit(updateIdRef.current),
       reject: () => {
         toast.current.show({
-          severity: "warn",
-          summary: "Cancelled",
-          detail: "Tour deletion cancelled",
+          severity: "info",
+          summary: "Abort",
+          detail: "Booking caancelled request abort",
           life: 3000,
         });
       },
     });
   };
 
-  const handleUpdateBooking = async (id) => {
-    updateBooking(id)
+  const handleSubmit = async (id) => {
+    const status = "request cancelled";
+    updateBookingStatus(id, status)
       .then((res) => {
         toast.current.show({
           severity: "success",
-          summary: "Request",
-          detail: "Tour deleted successfully",
+          summary: "Booking Cancel",
+          detail: "Cancel request send successfully",
           life: 3000,
         });
         console.log(res);
@@ -120,7 +125,7 @@ export default function MyBooking() {
         toast.current.show({
           severity: "error",
           summary: "Error",
-          detail: err.response?.data?.message || "Failed to delete tour",
+          detail: err.response?.data?.message || "Failed to cancel booking",
           life: 3000,
         });
       });
@@ -147,7 +152,7 @@ export default function MyBooking() {
             <Column field="price" header="Price"></Column>
             <Column field="participants" header="Participants"></Column>
             <Column field="date" header="Date"></Column>
-            <Column field="status" header="Status"></Column>
+            <Column header="Status" body={statusBodyTemplate}></Column>
             <Column header="Action" body={actionBodyTemplate}></Column>
           </DataTable>
         </div>
