@@ -27,6 +27,9 @@ exports.uploadAvatar = async (req, res, next) => {
 exports.getAllUsers = async (req, res, next) => {
   try {
     const users = await User.findAll({
+      where: {
+        role: "user",
+      },
       attributes: ["id", "name", "email", "role", "avatar", "createdAt"],
     });
 
