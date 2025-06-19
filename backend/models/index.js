@@ -3,7 +3,7 @@ const User = require("./userModel");
 const Tour = require("./tourModel");
 const Booking = require("./bookingModel");
 const Review = require("./reviewModel");
-
+const Notification = require("./notificationModel");
 // Define associations
 User.hasMany(Booking, {
   foreignKey: { name: "userId", allowNull: false },
@@ -44,10 +44,32 @@ Review.belongsTo(Tour, {
   onDelete: "CASCADE",
 });
 
+User.hasMany(Notification, {
+  foreignKey: { name: "userId", allowNull: false },
+  onDelete: "CASCADE",
+});
+
+Notification.belongsTo(User, {
+  foreignKey: { name: "userId", allowNull: false },
+  onDelete: "CASCADE",
+});
+
+Booking.hasMany(Notification, {
+  foreignKey: { name: "bookingId", allowNull: false },
+  onDelete: "CASCADE",
+});
+
+Notification.belongsTo(Booking, {
+  foreignKey: { name: "bookingId", allowNull: false },
+  onDelete: "CASCADE",
+});
+
 // Export all models
 module.exports = {
   sequelize,
   User,
   Tour,
+  Booking,
   Review,
+  Notification,
 };

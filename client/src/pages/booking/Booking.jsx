@@ -60,6 +60,19 @@ export default function Booking() {
         date,
         participants,
       });
+
+      // 🔔 Notify admin
+      await fetch(`${API}/notify`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          userId: user.id,
+          message: `New booking by ${user.name} for ${tour.title} on ${date}`,
+        }),
+      });
+
       resetForm();
       toast.current.show({
         severity: "info",
