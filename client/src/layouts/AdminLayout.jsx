@@ -5,6 +5,7 @@ import { Menubar } from "primereact/menubar";
 import { PanelMenu } from "primereact/panelmenu";
 import ProfileDropdown from "../components/ProfileDropdown";
 import Notifications from "../pages/admin/Notifications";
+import UnReadNotification from "../components/UnReadNotification";
 
 export default function AdminLayout() {
   const navigate = useNavigate();
@@ -22,7 +23,8 @@ export default function AdminLayout() {
   );
   const end = (
     <div className="flex align-items-center gap-2">
-      <Notifications />
+      <UnReadNotification />
+      {/* <Notifications /> */}
       <ProfileDropdown onSignOut={handleSignOut} />
     </div>
   );

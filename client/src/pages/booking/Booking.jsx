@@ -10,12 +10,13 @@ import { Toast } from "primereact/toast";
 import { useAuth } from "../../utils/useAuth";
 import { getTour } from "../../services/TourService";
 import { createBooking } from "../../services/BookingService";
+import { createNotification } from "../../services/NotificationService";
 
 export default function Booking() {
   const API = import.meta.env.VITE_API_URL || "http://localhost:3000/api";
   const [tour, setTour] = useState({});
   const { id } = useParams();
-  const { token, user } = useAuth();
+  const { user } = useAuth();
   const navigate = useNavigate();
   const toast = useRef(null);
   const [submitError, setSubmitError] = useState("");
@@ -40,13 +41,6 @@ export default function Booking() {
       .required("participants is required"),
   });
 
-  const auth = () => {
-    if (!token) {
-      alert("please login first");
-      navigate(`/signin`);
-    }
-  };
-
   const handleSubmit = async (values, { resetForm }) => {
     setIsSubmitting(true);
     setSubmitError("");
@@ -62,15 +56,10 @@ export default function Booking() {
       });
 
       // 🔔 Notify admin
-      await fetch(`${API}/notify`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          userId: user.id,
-          message: `New booking by ${user.name} for ${tour.title} on ${date}`,
-        }),
+      await createNotification({
+        bookingId: res.data.booking.id,
+        userId: user.id,
+        message: `New booking by ${user.name} for ${tour.title} on ${date}`,
       });
 
       resetForm();

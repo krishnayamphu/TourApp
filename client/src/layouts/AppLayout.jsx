@@ -5,6 +5,7 @@ import { AuthContext } from "../context/AuthContext";
 import ProfileDropdown from "../components/ProfileDropdown";
 import AuthDropdown from "../components/auth/AuthDropdown";
 import UserProfileDropdown from "../components/UserProfileDropdown";
+import ClientNotificationBell from "../components/ClientNotificationBell";
 
 export default function AppLayout() {
   const navigate = useNavigate();
@@ -32,7 +33,10 @@ export default function AppLayout() {
   const end = (
     <div className="flex align-items-center gap-2">
       {isAuthenticated ? (
-        <UserProfileDropdown user={user} onSignOut={handleSignOut} />
+        <div className="flex items-center gap-8">
+          <ClientNotificationBell userId={user.id} />
+          <UserProfileDropdown user={user} onSignOut={handleSignOut} />
+        </div>
       ) : (
         <AuthDropdown />
       )}

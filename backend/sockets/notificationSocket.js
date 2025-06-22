@@ -1,38 +1,16 @@
-// const { createNotification } = require("../controllers/notificationController");
-
 const notificationSocket = (io) => {
   io.on("connection", (socket) => {
-    console.log("Socket connected:", socket.id);
+    console.log("Client connected:", socket.id);
 
-    // Admin joins room
-    socket.on("joinAdminRoom", () => {
-      socket.join("admins");
-      console.log("Joined to admins room");
+    // Allow client to join their own room (based on userId)
+    socket.on("join-room", (roomId) => {
+      socket.join(roomId);
+      console.log(`Socket ${socket.id} joined room: ${roomId}`);
     });
 
-    socket.on("newBooking", (data) => {
-      console.log("New booking received:", data);
-
-      // Send to admin (could be specific room or all admins)
-      io.to("admins").emit("bookingNotification", {
-        message: `New booking from user ${data.userId} for tour ${data.tourId}`,
-        bookingId: data.bookingId,
-        date: data.date,
-      });
+    socket.on("disconnect", () => {
+      console.log("Client disconnected:", socket.id);
     });
-
-    // socket.on("send_notification", async ({ userId, message }) => {
-    //   try {
-    //     const notification = await createNotification({ userId, message });
-    //     io.emit(`notification_${userId}`, notification);
-    //   } catch (err) {
-    //     console.error("Notification error:", err);
-    //   }
-    // });
-
-    // socket.on("disconnect", () => {
-    //   console.log("Socket disconnected:", socket.id);
-    // });
   });
 };
 

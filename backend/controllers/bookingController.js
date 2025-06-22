@@ -1,5 +1,5 @@
 const Booking = require("../models/bookingModel");
-const Review = require("../models/reviewModel");
+const Notification = require("../models/notificationModel");
 const appError = require("../utils/appError");
 
 // Get all bookings
@@ -135,6 +135,16 @@ exports.updateBookingStatus = async (req, res, next) => {
 
     booking.status = status || booking.status;
     await booking.save();
+    // Send notification to client if marked as paid
+    if (status === "paid") {
+      const clientNotification = await Notification.create({
+        userId: booking.userId,
+        bookingId: booking.id,
+        message: "Your booking has been marked as paid. Thank you!",
+      });
+      const roomId = `user-${booking.userId}`;
+      req.io.to(roomId).emit("client-notification", clientNotification);
+    }
 
     res.status(200).json({
       status: "success",

@@ -1,11 +1,18 @@
 const { Notification } = require("../models");
-const Booking = require("../models/bookingModel");
 const appError = require("../utils/appError");
 
-// Get all bookings
+// Get all notifications
 exports.getNotifications = async (req, res, next) => {
   try {
-    const notifications = await Notification.findAll();
+    const notifications = await Notification.findAll({
+      order: [["createdAt", "DESC"]],
+      include: [
+        {
+          model: User,
+          attributes: ["id", "name", "email"],
+        },
+      ],
+    });
 
     res.status(200).json({
       status: "success",
@@ -17,30 +24,35 @@ exports.getNotifications = async (req, res, next) => {
   }
 };
 
-// Get booking by ID
-exports.getBooking = async (req, res, next) => {
+// Get all unread notifications
+exports.getUnReadNotifications = async (req, res, next) => {
   try {
-    const booking = await Booking.findByPk(req.params.id);
+    const notifications = await Notification.findAll({
+      where: { isRead: false },
+      order: [["createdAt", "DESC"]],
+    });
 
     res.status(200).json({
       status: "success",
-      booking,
+      results: notifications.length,
+      notifications,
     });
   } catch (err) {
     next(err);
   }
 };
-
-// Get bookings by TourID
-exports.getBookingsByTourId = async (req, res, next) => {
+// Get all unread notifications by userId
+exports.getUnReadNotificationsByUserId = async (req, res, next) => {
   try {
-    const tourId = req.params.tourId;
-    const bookings = await Booking.findAll({ where: { tourId } });
+    const notifications = await Notification.findAll({
+      where: { isRead: false },
+      order: [["createdAt", "DESC"]],
+    });
 
     res.status(200).json({
       status: "success",
-      results: bookings.length,
-      bookings,
+      results: notifications.length,
+      notifications,
     });
   } catch (err) {
     next(err);
@@ -48,7 +60,7 @@ exports.getBookingsByTourId = async (req, res, next) => {
 };
 
 // create a notification
-exports.saveNotification = async (req, res, next) => {
+exports.saveNotification = async (req, res) => {
   const { userId, message } = req.body;
   const bookingId = 1; // Example booking ID, replace with actual logic if needed
   try {

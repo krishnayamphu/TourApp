@@ -19,6 +19,7 @@
     "primereact": "^10.9.5",
     "react": "^19.1.0",
     "react-dom": "^19.1.0",
+    "socket.io-client": "^4.8.1",
     "tailwindcss": "^4.0.17",
     "yup": "^1.6.1"
   },

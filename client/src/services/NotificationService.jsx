@@ -10,39 +10,24 @@ export const getNotifications = async () => {
   });
 };
 
-//get booking by id
-export const getBooking = async (bookingId) => {
-  return axios.get(`${API}/bookings/${bookingId}`, {
+//get unread notifications
+export const getUnReadNotifications = async () => {
+  return axios.get(`${API}/notify/unread`, {
     headers: { Authorization: `Bearer ${token}` },
   });
 };
 
-//crate a booking
-export const createBooking = async (bookingData) => {
+//get unread notifications by userId
+export const getUnReadNotificationsByUserId = async (userId) => {
+  return axios.get(`${API}/notify/unread/${userId}`, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+};
+
+//crate a notification
+export const createNotification = async (notificationData) => {
   if (!token) return "token not set";
-  return axios.post(`${API}/bookings`, bookingData, {
+  return axios.post(`${API}/notify`, notificationData, {
     headers: { Authorization: `Bearer ${token}` },
   });
-};
-
-//update status by id
-export const updateReadStatus = async (id, status) => {
-  return axios.put(
-    `${API}/notify/status/${id}`,
-    { status },
-    {
-      headers: { Authorization: `Bearer ${token}` },
-    }
-  );
-};
-
-//update booking status by id
-export const updateBookingStatus = async (bookingId, status) => {
-  return axios.put(
-    `${API}/bookings/status/${bookingId}`,
-    { status },
-    {
-      headers: { Authorization: `Bearer ${token}` },
-    }
-  );
 };

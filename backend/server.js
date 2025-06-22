@@ -20,6 +20,13 @@ const port = 3000;
 const corsOptions = { origin: "*" };
 const httpServer = http.createServer(app);
 const io = new Server(httpServer, { cors: corsOptions });
+// const io = new Server(httpServer, {
+//   cors: {
+//     origin: "http://localhost:5173", // or your React/Vite app port
+//     methods: ["GET", "POST"],
+//     credentials: true,
+//   },
+// });
 
 // sequelize.sync({ force: true }); // or { alter: true } if safer
 const { sequelize } = require("./models");
